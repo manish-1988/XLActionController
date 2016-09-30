@@ -29,24 +29,37 @@ public protocol SeparatorCellType: NSObjectProtocol {
     func hideSeparator()
 }
 
-open class ActionCell: UICollectionViewCell, SeparatorCellType {
+public class ActionCell: UICollectionViewCell, SeparatorCellType {
 
-    @IBOutlet open weak var actionTitleLabel: UILabel?
-    @IBOutlet open weak var actionImageView: UIImageView?
-    @IBOutlet open weak var actionDetailLabel: UILabel?
-    @IBOutlet open weak var separatorView: UIView?
+    @IBOutlet public weak var actionTitleLabel: UILabel?
+    @IBOutlet public weak var actionImageView: UIImageView?
+    @IBOutlet public weak var actionDetailLabel: UILabel?
+    @IBOutlet public weak var separatorView: UIView?
 
-    open func setup(_ title: String?, detail: String?, image: UIImage?) {
+    public func setup(title: String?, detail: String?, image: UIImage?) {
         actionTitleLabel?.text = title
         actionDetailLabel?.text = detail
         actionImageView?.image = image
+
+        if let _ = image {
+            actionTitleLabelConstraintToContainer?.priority = UILayoutPriorityDefaultHigh
+            actionTitleLabelConstraintToImageView?.priority = UILayoutPriorityRequired
+        } else {
+            actionTitleLabelConstraintToContainer?.priority = UILayoutPriorityRequired
+            actionTitleLabelConstraintToImageView?.priority = UILayoutPriorityDefaultHigh
+        }
     }
     
-    open func showSeparator() {
+    
+    @IBOutlet private weak var actionTitleLabelConstraintToContainer: NSLayoutConstraint?
+    @IBOutlet private weak var actionTitleLabelConstraintToImageView: NSLayoutConstraint?
+    
+    
+    public func showSeparator() {
         separatorView?.alpha = 1.0
     }
     
-    open func hideSeparator() {
+    public func hideSeparator() {
         separatorView?.alpha = 0.0
     }
 }
