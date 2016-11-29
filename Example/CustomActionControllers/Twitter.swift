@@ -90,6 +90,12 @@ open class TwitterActionControllerHeader: UICollectionReusableView {
 
 open class TwitterActionController: ActionController<TwitterCell, ActionData, TwitterActionControllerHeader, String, UICollectionReusableView, Void> {
     
+    public var cellColor : UIColor!
+    public var headerColor : UIColor!
+    public var fontNameSubTitle : UIFont!
+    public var fontNameDetail : UIFont!
+
+    
     public override init(nibName nibNameOrNil: String? = nil, bundle nibBundleOrNil: Bundle? = nil) {
         super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
         settings.animation.present.duration = 0.6
@@ -100,11 +106,33 @@ open class TwitterActionController: ActionController<TwitterCell, ActionData, Tw
         
         onConfigureHeader = { header, title in
             header.label.text = title
+            if self.headerColor != nil
+            {
+                header.backgroundColor = self.headerColor
+            }
+
         }
         onConfigureCellForAction = { [weak self] cell, action, indexPath in
             cell.setup(action.data?.title, detail: action.data?.subtitle, image: action.data?.image)
             cell.separatorView?.isHidden = indexPath.item == (self?.collectionView.numberOfItems(inSection: indexPath.section))! - 1
             cell.alpha = action.enabled ? 1.0 : 0.5
+            
+            if self?.cellColor != nil
+            {
+                cell.backgroundColor = self?.cellColor
+            }
+            
+            
+            if self?.fontNameSubTitle != nil
+            {
+                cell.actionTitleLabel?.font = self?.fontNameSubTitle
+            }
+            
+            if self?.fontNameDetail != nil
+            {
+                cell.actionDetailLabel?.font = self?.fontNameDetail
+            }
+
         }
     }
   
