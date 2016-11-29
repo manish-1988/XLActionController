@@ -99,7 +99,7 @@ public class TwitterActionControllerHeader: UICollectionReusableView {
     
     override init(frame: CGRect) {
         super.init(frame: frame)
-        backgroundColor = .whiteColor()
+        backgroundColor = .yellowColor()
         addSubview(label)
         addConstraints(NSLayoutConstraint.constraintsWithVisualFormat("V:|[label]|", options: NSLayoutFormatOptions(), metrics: nil, views: ["label": label]))
         addConstraints(NSLayoutConstraint.constraintsWithVisualFormat("H:|[label]|", options: NSLayoutFormatOptions(), metrics: nil, views: ["label": label]))
@@ -115,60 +115,75 @@ public class TwitterActionControllerHeader: UICollectionReusableView {
 
 
 public class TwitterActionController: ActionController<TwitterCell, ActionData, TwitterActionControllerHeader, String, UICollectionReusableView, Void> {
+    public var cellColor : UIColor!
+    public var headerColor : UIColor!
     
-    public override init(nibName nibNameOrNil: String? = nil, bundle nibBundleOrNil: NSBundle? = nil) {
+    public override init(nibName nibNameOrNil: String? = nil, bundle nibBundleOrNil: Bundle? = nil) {
         super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
         settings.animation.present.duration = 0.6
         settings.animation.dismiss.duration = 0.6
-        cellSpec = CellSpec.NibFile(nibName: "TwitterCell", bundle: NSBundle(forClass: TwitterCell.self), height: { _ in 56 })
-        headerSpec = .CellClass(height: { _ -> CGFloat in return 45 })
+        cellSpec = CellSpec.nibFile(nibName: "TwitterCell", bundle: Bundle(for: TwitterCell.self), height: { _ in 56 })
+        headerSpec = .cellClass(height: { _ -> CGFloat in return 45 })
         
         
         onConfigureHeader = { header, title in
             header.label.text = title
+            if self.headerColor != nil
+            {
+                header.backgroundColor = self.headerColor
+            }
+            
         }
         onConfigureCellForAction = { [weak self] cell, action, indexPath in
-            
+            if self?.cellColor != nil
+            {
+                cell.backgroundColor = self?.cellColor
+            }
             cell.setup(action.data?.title, detail: action.data?.subtitle, image: action.data?.image)
-            cell.separatorView?.hidden = indexPath.item == (self?.collectionView.numberOfItemsInSection(indexPath.section))! - 1
+            cell.separatorView?.isHidden = indexPath.item == (self?.collectionView.numberOfItems(inSection: indexPath.section))! - 1
             cell.alpha = action.enabled ? 1.0 : 0.5
         }
     }
     
-    public override func viewDidLoad() {
+    required public init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    open override func viewDidLoad() {
         super.viewDidLoad()
         
         collectionView.clipsToBounds = false
         let hideBottomSpaceView: UIView = {
-            let hideBottomSpaceView = UIView(frame: CGRectMake(0, 0, collectionView.bounds.width, contentHeight + 20))
-            hideBottomSpaceView.autoresizingMask = UIViewAutoresizing.FlexibleWidth.union(.FlexibleBottomMargin)
-            hideBottomSpaceView.backgroundColor = .whiteColor()
+            let hideBottomSpaceView = UIView(frame: CGRect(x: 0, y: 0, width: collectionView.bounds.width, height: contentHeight + 20))
+            hideBottomSpaceView.autoresizingMask = [.flexibleWidth, .flexibleBottomMargin]
+            hideBottomSpaceView.backgroundColor = .white
             return hideBottomSpaceView
         }()
         collectionView.addSubview(hideBottomSpaceView)
-        collectionView.sendSubviewToBack(hideBottomSpaceView)
+        collectionView.sendSubview(toBack: hideBottomSpaceView)
+        
     }
     
-    override public func dismissView(presentedView: UIView, presentingView: UIView, animationDuration: Double, completion: ((completed: Bool) -> Void)?) {
+    override open func dismissView(_ presentedView: UIView, presentingView: UIView, animationDuration: Double, completion: ((_ completed: Bool) -> Void)?) {
         onWillDismissView()
         let animationSettings = settings.animation.dismiss
         let upTime = 0.1
-        UIView.animateWithDuration(upTime, delay: 0, options: .CurveEaseIn, animations: { [weak self] in
+        UIView.animate(withDuration: upTime, delay: 0, options: .curveEaseIn, animations: { [weak self] in
             self?.collectionView.frame.origin.y -= 10
-        }, completion: { [weak self] (completed) -> Void in
-            UIView.animateWithDuration(animationDuration - upTime,
-                delay: 0,
-                usingSpringWithDamping: animationSettings.damping,
-                initialSpringVelocity: animationSettings.springVelocity,
-                options: UIViewAnimationOptions.CurveEaseIn,
-                animations: { [weak self] in
-                    presentingView.transform = CGAffineTransformIdentity
-                    self?.performCustomDismissingAnimation(presentedView, presentingView: presentingView)
-                },
-                completion: { [weak self] finished in
-                    self?.onDidDismissView()
-                    completion?(completed: finished)
-                })
-        })
+            }, completion: { [weak self] (completed) -> Void in
+                UIView.animate(withDuration: animationDuration - upTime,
+                               delay: 0,
+                               usingSpringWithDamping: animationSettings.damping,
+                               initialSpringVelocity: animationSettings.springVelocity,
+                               options: UIViewAnimationOptions.curveEaseIn,
+                               animations: { [weak self] in
+                                presentingView.transform = CGAffineTransform.identity
+                                self?.performCustomDismissingAnimation(presentedView, presentingView: presentingView)
+                    },
+                               completion: { [weak self] finished in
+                                self?.onDidDismissView()
+                                completion?(finished)
+                    })
+            })
     }
 }
