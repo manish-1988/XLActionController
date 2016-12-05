@@ -94,6 +94,7 @@ open class TwitterActionController: ActionController<TwitterCell, ActionData, Tw
     public var headerColor : UIColor!
     public var fontNameSubTitle : UIFont!
     public var fontNameDetail : UIFont!
+    public var separatorColor : UIColor!
 
     
     public override init(nibName nibNameOrNil: String? = nil, bundle nibBundleOrNil: Bundle? = nil) {
@@ -116,6 +117,11 @@ open class TwitterActionController: ActionController<TwitterCell, ActionData, Tw
             cell.setup(action.data?.title, detail: action.data?.subtitle, image: action.data?.image)
             cell.separatorView?.isHidden = indexPath.item == (self?.collectionView.numberOfItems(inSection: indexPath.section))! - 1
             cell.alpha = action.enabled ? 1.0 : 0.5
+            if self?.separatorColor != nil
+            {
+                cell.separatorView?.backgroundColor = self?.separatorColor
+            }
+            
             
             if self?.cellColor != nil
             {
