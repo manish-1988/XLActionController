@@ -95,7 +95,7 @@ open class TwitterActionController: ActionController<TwitterCell, ActionData, Tw
     public var fontNameSubTitle : UIFont!
     public var fontNameDetail : UIFont!
     public var separatorColor : UIColor!
-
+    public var fontNameHeader : UIFont!
     
     public override init(nibName nibNameOrNil: String? = nil, bundle nibBundleOrNil: Bundle? = nil) {
         super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
@@ -111,7 +111,10 @@ open class TwitterActionController: ActionController<TwitterCell, ActionData, Tw
             {
                 header.backgroundColor = self.headerColor
             }
-
+            if self.fontNameHeader != nil
+            {
+                header.label.font = self.fontNameHeader
+            }
         }
         onConfigureCellForAction = { [weak self] cell, action, indexPath in
             cell.setup(action.data?.title, detail: action.data?.subtitle, image: action.data?.image)
